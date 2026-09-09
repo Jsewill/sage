@@ -4,6 +4,7 @@ import {
   copyFileSync,
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -32,12 +33,7 @@ test('Arch uses the working-tree version and orders release candidates before re
       assert.equal(
         execFileSync(
           'bash',
-          [
-            '-c',
-            'startdir=$1; source "$startdir/PKGBUILD"; pkgver',
-            'test',
-            archDir,
-          ],
+          ['-c', 'source "$1/PKGBUILD"; pkgver', 'test', archDir],
           { encoding: 'utf8' },
         ).trim(),
         expected,
@@ -51,5 +47,42 @@ test('Arch uses the working-tree version and orders release candidates before re
     );
   } finally {
     rmSync(checkout, { recursive: true, force: true });
+  }
+});
+
+test('Arch launcher preserves arguments and allows overriding the Wayland default', () => {
+  const launcher = readFileSync(
+    resolve(import.meta.dirname, '../src-tauri/arch/sage-tauri'),
+    'utf8',
+  );
+  const command = 'exec /usr/lib/sage-wallet/sage-tauri "$@"';
+  assert.ok(
+    launcher.includes(command),
+    'Launcher must forward arguments to the packaged binary',
+  );
+  // Substitute the final exec to observe the real launcher's environment without opening a wallet.
+  const probe = launcher.replace(
+    command,
+    'printf "%s\\n" "${__NV_DISABLE_EXPLICIT_SYNC-unset}" "$@"',
+  );
+  const env = { ...process.env };
+  delete env.WAYLAND_DISPLAY;
+  delete env.__NV_DISABLE_EXPLICIT_SYNC;
+  for (const [overrides, expected] of [
+    [{}, 'unset'],
+    [{ WAYLAND_DISPLAY: 'wayland-0' }, '1'],
+    [{ WAYLAND_DISPLAY: 'wayland-0', __NV_DISABLE_EXPLICIT_SYNC: '0' }, '0'],
+  ]) {
+    assert.equal(
+      execFileSync(
+        'sh',
+        ['-c', probe, 'sage-tauri', 'argument with spaces', '--flag'],
+        {
+          env: { ...env, ...overrides },
+          encoding: 'utf8',
+        },
+      ),
+      `${expected}\nargument with spaces\n--flag\n`,
+    );
   }
 });

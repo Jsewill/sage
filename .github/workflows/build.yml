@@ -336,12 +336,6 @@ jobs:
             target/release/bundle/appimage/*.AppImage
 
       # Arch Linux x64
-      - name: Check Arch package
-        if: matrix.platform_name == 'Arch Linux (x64)'
-        run: |
-          node --test scripts/package-arch.test.mjs
-          pnpm check:arch-package target/release/bundle/arch/*.pkg.tar.zst
-
       - name: Upload package (Arch Linux x64)
         uses: actions/upload-artifact@v4
         if: matrix.platform_name == 'Arch Linux (x64)'

@@ -21,7 +21,7 @@ makedepends=('rustup' 'clang' 'cmake' 'git' 'nodejs>=22.12.0' 'pnpm')
 checkdepends=('desktop-file-utils')
 options=('!debug' '!lto')
 
-_repo_dir=$(realpath "$startdir/../..")
+_repo_dir=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
 
 pkgver() {
   cd "$_repo_dir"
@@ -54,21 +54,23 @@ build() {
 }
 
 check() {
-  desktop-file-validate "$startdir/sage-wallet.desktop"
-  sh -n "$startdir/sage-tauri"
+  cd "$_repo_dir"
+  desktop-file-validate src-tauri/arch/sage-wallet.desktop
+  sh -n src-tauri/arch/sage-tauri
+  node --test scripts/package-arch.test.mjs
 }
 
 package() {
   cd "$_repo_dir"
   install -Dm755 "$_repo_dir/target/release/sage-tauri" "$pkgdir/usr/lib/sage-wallet/sage-tauri"
-  install -Dm755 "$startdir/sage-tauri" "$pkgdir/usr/bin/sage-tauri"
+  install -Dm755 src-tauri/arch/sage-tauri "$pkgdir/usr/bin/sage-tauri"
 
   # Tauri resolves resources using productName ("Sage"), including its case.
   install -d "$pkgdir/usr/lib/Sage/builtin-apps"
   cp -r builtin-apps/build/dist/. "$pkgdir/usr/lib/Sage/builtin-apps/"
   rm -f "$pkgdir/usr/lib/Sage/builtin-apps/.gitkeep"
 
-  install -Dm644 "$startdir/sage-wallet.desktop" "$pkgdir/usr/share/applications/sage-wallet.desktop"
+  install -Dm644 src-tauri/arch/sage-wallet.desktop "$pkgdir/usr/share/applications/sage-wallet.desktop"
   install -Dm644 src-tauri/icons/32x32.png "$pkgdir/usr/share/icons/hicolor/32x32/apps/sage-tauri.png"
   install -Dm644 src-tauri/icons/128x128.png "$pkgdir/usr/share/icons/hicolor/128x128/apps/sage-tauri.png"
   install -Dm644 src-tauri/icons/128x128@2x.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/sage-tauri.png"

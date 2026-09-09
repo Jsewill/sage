@@ -19,15 +19,13 @@ From the repository root, after `pnpm install`, the equivalent command is:
 
 ```bash
 pnpm package:arch
-pnpm check:arch-package target/release/bundle/arch/*.pkg.tar.zst
 sudo pacman -U target/release/bundle/arch/sage-wallet-*.pkg.tar.zst
 ```
 
 This uses the same recipe and writes the package under `target/release/bundle/arch`,
 alongside the other Tauri bundles. Additional arguments go to makepkg, for example
-`pnpm package:arch --noconfirm`. The check requires `desktop-file-utils`, included
-in the recipe's check dependencies. Use the specific package filename if the
-output directory contains several versions.
+`pnpm package:arch --noconfirm`. Use the specific package filename if the output
+directory contains several versions.
 
 The recipe uses the existing Tauri build and its `beforeBuildCommand` to build
 the frontend and built-in apps. Rustup and pnpm select the versions pinned in
@@ -38,9 +36,10 @@ compiler flag for its old `memchr` wrapper with glibc 2.44; recheck it when
 updating that dependency.
 
 Arch is an entry in the existing CI build matrix, using an Arch container and
-a non-root makepkg user. CI checks and uploads the package and attaches it to
-`v*` releases. Run `node --test scripts/package-arch.test.mjs` on Arch to check
-working-tree version handling.
+a non-root makepkg user. The recipe's `check()` hook validates the desktop entry
+and launcher syntax and runs the working-tree version and launcher tests. CI
+uploads the package and attaches it to `v*` releases. Run
+`node --test scripts/package-arch.test.mjs` on Arch to run those tests separately.
 
 Launch **Sage** from the application menu or run `sage-tauri`. The package contains
 the wallet, launcher, desktop entry, icons, and built-in apps. Tauri loads the
