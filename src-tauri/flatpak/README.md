@@ -63,8 +63,9 @@ Remove the setting after confirming an updated runtime/driver works without it.
 
 ## Checks
 
-Packaging automatically checks the executable, resources, icons, desktop entry,
-and library/symbol resolution inside the GNOME runtime. To rerun those checks:
+Packaging automatically checks the executable, icons, license, desktop entry,
+and library/symbol resolution inside the GNOME runtime. Built-in resources come
+from the existing Tauri DEB. To rerun the package checks:
 
 ```sh
 pnpm check:flatpak-package target/flatpak/build

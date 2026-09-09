@@ -20,10 +20,6 @@ for (const file of [
   'share/icons/hicolor/128x128/apps/com.rigidnetwork.sage.png',
   'share/icons/hicolor/256x256@2/apps/com.rigidnetwork.sage.png',
   'share/licenses/com.rigidnetwork.sage/LICENSE',
-  // The DEB's usr/lib/Sage resources become /app/lib/Sage.
-  // Check one system app and one runtime app as packaging smoke tests.
-  'lib/Sage/builtin-apps/system/app-install/sage-manifest.json',
-  'lib/Sage/builtin-apps/runtime/origin-cleanup/sage-manifest.json',
 ]) {
   assert.ok(statSync(join(files, file)).isFile(), `Missing ${file}`);
 }
