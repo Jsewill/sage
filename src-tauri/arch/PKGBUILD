@@ -1,6 +1,6 @@
 pkgname=sage-wallet
 pkgver=0.13.0
-pkgrel=3
+pkgrel=4
 pkgdesc='A light wallet for the Chia blockchain'
 arch=('x86_64')
 url='https://github.com/xch-dev/sage'

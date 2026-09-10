@@ -51,5 +51,9 @@ This [Tauri workaround](https://v2.tauri.app/develop/debug/linux-graphics/) keep
 hardware acceleration enabled. Override it with
 `__NV_DISABLE_EXPLICIT_SYNC=0 sage-tauri` when testing newer drivers or WebKitGTK.
 
+Sage sizes its main webview to GTK's content area when using native Wayland,
+keeping bottom controls such as Logout visible below the title bar. This uses
+the active GTK backend; X11 and XWayland retain Tauri's existing resize behavior.
+
 Increment `pkgrel` for packaging changes within an app version. ARM builds,
 AUR publication, and a pacman repository are not configured.
